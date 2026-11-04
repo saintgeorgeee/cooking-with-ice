@@ -1,0 +1,61 @@
+name: Build desktop downloads
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release tag (for example v1.0.0)
+        required: true
+        default: v1.0.0
+permissions:
+  contents: write
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-15
+            artifact: Discord-Activity-Controller-macOS-Apple-Silicon
+          - os: macos-15-intel
+            artifact: Discord-Activity-Controller-macOS-Intel
+          - os: windows-2022
+            artifact: Discord-Activity-Controller-Windows
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r desktop/requirements.txt
+      - name: Build macOS app
+        if: runner.os == 'macOS'
+        run: |
+          python -m PyInstaller --noconfirm --clean --windowed --name 'Discord Activity Controller' --paths desktop --add-data 'desktop/static:static' --add-data 'desktop/activities.json:.' --hidden-import windows_rpc --collect-all webview desktop/desktop.py
+          ditto -c -k --sequesterRsrc --keepParent 'dist/Discord Activity Controller.app' '${{ matrix.artifact }}.zip'
+      - name: Build Windows app
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          python -m PyInstaller --noconfirm --clean --windowed --name 'Discord Activity Controller' --paths desktop --add-data 'desktop/static;static' --add-data 'desktop/activities.json;.' --hidden-import windows_rpc --collect-all webview desktop/desktop.py
+          Compress-Archive -Path 'dist/Discord Activity Controller' -DestinationPath '${{ matrix.artifact }}.zip'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.artifact }}.zip
+          if-no-files-found: error
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: Discord-Activity-Controller-*
+          merge-multiple: true
+          path: downloads
+      - name: Publish release downloads
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ inputs.version }}
+        run: |
+          gh release create "$RELEASE_TAG" downloads/*.zip --title "Discord Activity Controller $RELEASE_TAG" --notes "Desktop downloads for macOS and Windows. These builds are unsigned."
