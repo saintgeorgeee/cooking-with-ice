@@ -82,7 +82,7 @@ function renderCards(force = false) {
 function clock() {
   const activity = activities[status.selected_id];
   if (!activity) return;
-  if (!activity.timer) { $('#elapsed').textContent = status.phase === 'active' ? 'Il tuo stato è visibile su Discord.' : 'Ripristino automatico appena Discord è disponibile.'; return; }
+  if (!activity.timer) { $('#elapsed').textContent = status.phase === 'active' ? 'Attiva su Discord.' : 'Ripristino automatico appena Discord è disponibile.'; return; }
   const elapsed = Math.max(0, Math.floor(Date.now() / 1000 - status.started_at));
   const h = Math.floor(elapsed / 3600), m = Math.floor(elapsed / 60) % 60, s = elapsed % 60;
   $('#elapsed').textContent = `Tempo trascorso · ${[h,m,s].map(n => String(n).padStart(2,'0')).join(':')}${status.phase === 'active' ? '' : ' · in attesa di Discord'}`;
