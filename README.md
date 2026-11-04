@@ -1,17 +1,14 @@
-# Animated Discord Rich Presence
+# Framewisp — Animated Discord Rich Presence
 
-Show **Cooking with ice** or **Framewisp making pancakes** on your Discord profile using a small Python script. Start it from **Terminal on macOS** or **PowerShell on Windows**.
+Show **Framewisp making pancakes** on your Discord profile using a small Python script. Start it from **Terminal on macOS** or **PowerShell on Windows**.
 
-| Cooking with ice | Framewisp |
-| :---: | :---: |
-| <img src="minecraft_ice_cycle_512_5fps_exact_timing.webp" width="180" alt="Animated Minecraft ice"> | <img src="Wispy_making_pancakes.webp" width="180" alt="Framewisp making pancakes"> |
+<img src="Wispy_making_pancakes.webp" width="220" alt="Framewisp making pancakes">
 
 **No dashboard, bot token, client secret, or Git installation required.** You do need the Discord **desktop** app and Python **3.9 or newer**.
 
 - [Choose your activity name](#1-choose-your-activity-name)
 - [macOS — Terminal](#macos--terminal)
 - [Windows — PowerShell](#windows--powershell)
-- [Quick option: use the shared Cooking with ice application](#quick-option-use-the-shared-cooking-with-ice-application)
 - [Troubleshooting](#troubleshooting)
 
 ## 1. Choose your activity name
@@ -19,15 +16,13 @@ Show **Cooking with ice** or **Framewisp making pancakes** on your Discord profi
 **Recommended: create your own Discord application.** This lets you choose the name displayed on your profile.
 
 1. Open the [Discord Developer Portal](https://discord.com/developers/applications) and sign in.
-2. Click **New Application** and give it the name you want people to see, such as `Framewisp` or `Cooking with ice`.
+2. Click **New Application** and give it the name you want people to see, such as `Framewisp`.
 3. Open **General Information** and copy the **Application ID**.
 4. Keep that ID ready. Replace `YOUR_APPLICATION_ID` in the commands below with the actual number, without spaces.
 
-The `--activity` option selects the **image preset**. Your Application ID determines the **registered application name** shown by this script. For example, choosing `--activity framewisp` does not rename an application called `My Pancakes`.
+The commands below select the Framewisp animation. Your Application ID determines the **registered application name** shown by this script. If you name your application `My Pancakes`, that is the name Discord will display.
 
-To switch between **two different names**, create two applications and use the matching ID for each. To switch only the image, you can reuse the same ID.
-
-You do not need to create a bot, invite anything to a server, or copy any token. An Application ID is public configuration, not a password. If you prefer to use the existing shared Cooking with ice application, see the [quick option](#quick-option-use-the-shared-cooking-with-ice-application).
+You do not need to create a bot, invite anything to a server, or copy any token. An Application ID is public configuration, not a password.
 
 ## macOS — Terminal
 
@@ -58,13 +53,7 @@ Wait for installation to finish successfully before continuing. You only need to
 
 ### 3. Start an activity
 
-Replace `YOUR_APPLICATION_ID` with the ID copied from the Developer Portal. Choose **one** command:
-
-**Cooking with ice image:**
-
-```bash
-.venv/bin/python rich_presence.py --activity cooking --client-id YOUR_APPLICATION_ID
-```
+Replace `YOUR_APPLICATION_ID` with the ID copied from the Developer Portal.
 
 **Framewisp image:**
 
@@ -83,7 +72,7 @@ cd "$HOME/discord-rich-presence"
 .venv/bin/python rich_presence.py --activity framewisp --client-id YOUR_APPLICATION_ID
 ```
 
-Use `--activity cooking` instead if you want the ice animation. You do **not** need to reinstall the package each time.
+You do **not** need to reinstall the package each time.
 
 ## Windows — PowerShell
 
@@ -116,13 +105,7 @@ Wait for installation to finish successfully before continuing. You only need to
 
 ### 3. Start an activity
 
-Replace `YOUR_APPLICATION_ID` with the ID copied from the Developer Portal. Choose **one** command:
-
-**Cooking with ice image:**
-
-```powershell
-.\.venv\Scripts\python.exe rich_presence.py --activity cooking --client-id YOUR_APPLICATION_ID
-```
+Replace `YOUR_APPLICATION_ID` with the ID copied from the Developer Portal.
 
 **Framewisp image:**
 
@@ -141,41 +124,11 @@ Set-Location "$HOME\discord-rich-presence"
 .\.venv\Scripts\python.exe rich_presence.py --activity framewisp --client-id YOUR_APPLICATION_ID
 ```
 
-Use `--activity cooking` instead if you want the ice animation. You do **not** need to reinstall the package each time.
+You do **not** need to reinstall the package each time.
 
-## Quick option: use the shared Cooking with ice application
+## Framewisp animation URL
 
-You can use the public Application ID **`1566577658631028847`** instead of creating an application. The script defaults to that ID when you select Cooking with ice without `--client-id`.
-
-**macOS**, after completing setup:
-
-```bash
-cd "$HOME/discord-rich-presence"
-.venv/bin/python rich_presence.py --activity cooking
-```
-
-**Windows PowerShell**, after completing setup:
-
-```powershell
-Set-Location "$HOME\discord-rich-presence"
-.\.venv\Scripts\python.exe rich_presence.py --activity cooking
-```
-
-The registered name will be **Cooking with ice**. Using this ID does not let you choose your own application name. Create your own application for a custom name.
-
-No shared Framewisp Application ID is included. For that preset, use your own Application ID as shown in the main instructions. The animation URL is already configured; you do not need to upload it again.
-
-## Image URLs
-
-The script includes both public image URLs:
-
-**Cooking with ice**
-
-```text
-https://raw.githubusercontent.com/saintgeorgeee/cooking-with-ice/refs/heads/main/minecraft_ice_cycle_512_5fps_exact_timing.webp
-```
-
-**Framewisp**
+The Framewisp URL is already included in the script. You do not need to upload the animation again or paste the URL into the start command.
 
 ```text
 https://raw.githubusercontent.com/saintgeorgeee/cooking-with-ice/refs/heads/main/Wispy_making_pancakes.webp
