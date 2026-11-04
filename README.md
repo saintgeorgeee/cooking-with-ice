@@ -4,7 +4,7 @@ Show **Framewisp making pancakes** on your Discord profile using a small Python 
 
 <img src="Wispy_making_pancakes.webp" width="220" alt="Framewisp making pancakes">
 
-**No dashboard, bot token, client secret, or Git installation required.** You do need the Discord **desktop** app and Python **3.9 or newer**.
+You do need the Discord **desktop** app and Python **3.9 or newer**.
 
 - [Choose your activity name](#1-choose-your-activity-name)
 - [macOS — Terminal](#macos--terminal)
@@ -16,7 +16,7 @@ Show **Framewisp making pancakes** on your Discord profile using a small Python 
 **Recommended: create your own Discord application.** This lets you choose the name displayed on your profile.
 
 1. Open the [Discord Developer Portal](https://discord.com/developers/applications) and sign in.
-2. Click **New Application** and give it the name you want people to see, such as `Framewisp`.
+2. Click **New Application** and give it the name you want people to see, such as `Framewisp`. You CAN change the name at any moment even after you're done with the setup, just save it from the developer portal and restart Discord for it to show
 3. Open **General Information** and copy the **Application ID**.
 4. Keep that ID ready. Replace `YOUR_APPLICATION_ID` in the commands below with the actual number, without spaces.
 
