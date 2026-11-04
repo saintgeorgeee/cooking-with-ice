@@ -53,13 +53,13 @@ class Handler(BaseHTTPRequestHandler):
         port = self.server.server_address[1]
         hosts = {f'127.0.0.1:{port}', f'localhost:{port}'}
         if self.headers.get('Host') not in hosts:
-            return self.reply(403, {'error': 'Host non consentito.'})
+            return self.reply(403, {'error': 'Host not allowed.'})
         path = unquote(urlsplit(self.path).path)
         mutation = self.command in {'POST', 'PUT', 'DELETE'}
         if mutation:
             origin = self.headers.get('Origin')
             if (origin and origin not in {f'http://{host}' for host in hosts}) or not secrets.compare_digest(self.headers.get('X-Controller-Token', ''), self.state.token):
-                return self.reply(403, {'error': 'Richiesta non autorizzata. Ricarica il dashboard.'})
+                return self.reply(403, {'error': 'Unauthorized request. Reload the app.'})
         if self.command == 'GET':
             if path == '/api/status':
                 return self.reply(200, self.state.rpc.status())
@@ -73,9 +73,9 @@ class Handler(BaseHTTPRequestHandler):
                 static = (ROOT / 'static').resolve()
                 if static in file.parents and file.is_file():
                     return self.reply(200, file.read_bytes(), mimetypes.guess_type(str(file))[0] or 'application/octet-stream')
-            return self.reply(404, {'error': 'Risorsa non trovata.'})
+            return self.reply(404, {'error': 'Resource not found.'})
         if not mutation:
-            return self.reply(405, {'error': 'Metodo non consentito.'})
+            return self.reply(405, {'error': 'Method not allowed.'})
         with self.state.lock:
             activities = self.state.config.snapshot()
             if path == '/api/deactivate' and self.command == 'POST':
@@ -86,9 +86,9 @@ class Handler(BaseHTTPRequestHandler):
                     and parts[3] == 'activate' and self.command == 'POST'):
                 key = parts[2]
                 if key not in activities:
-                    return self.reply(404, {'error': 'Attività non trovata.'})
+                    return self.reply(404, {'error': 'Activity not found.'})
                 if not activities[key]['application_id']:
-                    raise ValidationError('Configura l’Application ID prima di attivare questa attività.')
+                    raise ValidationError('Add an Application ID before activating this activity.')
                 self.state.rpc.select(key, activities[key])
                 return self.reply(202, self.state.rpc.status())
             if path == '/api/activities' and self.command == 'POST':
@@ -100,11 +100,11 @@ class Handler(BaseHTTPRequestHandler):
             if len(parts) == 3 and parts[:2] == ['api', 'activities']:
                 key = parts[2]
                 if key not in activities:
-                    return self.reply(404, {'error': 'Attività non trovata.'})
+                    return self.reply(404, {'error': 'Activity not found.'})
                 if self.command == 'PUT':
                     config = validate_activity(self.read_json())
                     if self.state.rpc.status()['selected_id'] == key and not config['application_id']:
-                        raise ValidationError('Spegni l’attività prima di rimuoverne l’Application ID.')
+                        raise ValidationError('Turn off the activity before removing its Application ID.')
                     activities[key] = config
                     self.state.config.save(activities)
                     if self.state.rpc.status()['selected_id'] == key:
@@ -116,17 +116,17 @@ class Handler(BaseHTTPRequestHandler):
                     if self.state.rpc.status()['selected_id'] == key:
                         self.state.rpc.select(None, None)
                     return self.reply(200, {'deleted': key})
-            return self.reply(404, {'error': 'Endpoint non trovato.'})
+            return self.reply(404, {'error': 'Endpoint not found.'})
 
     def read_json(self):
         if self.headers.get_content_type() != 'application/json':
-            raise ValidationError('Invia un oggetto application/json.')
+            raise ValidationError('Send an application/json object.')
         try:
             length = int(self.headers.get('Content-Length', '0'))
         except ValueError as exc:
-            raise ValidationError('Lunghezza della richiesta non valida.') from exc
+            raise ValidationError('Invalid request length.') from exc
         if not 0 < length <= 32768:
-            raise ValidationError('La richiesta deve contenere al massimo 32 KB.')
+            raise ValidationError('Request must be at most 32 KB.')
         return json.loads(self.rfile.read(length))
 
     def handle_request(self):
@@ -138,7 +138,7 @@ class Handler(BaseHTTPRequestHandler):
         except (BrokenPipeError, ConnectionResetError):
             pass
         except OSError:
-            self.reply(500, {'error': 'Impossibile leggere o salvare il file locale. Controlla i permessi.'})
+            self.reply(500, {'error': 'Could not read or save the local file. Check permissions.'})
 
     do_GET = do_POST = do_PUT = do_DELETE = do_OPTIONS = handle_request
 
@@ -155,9 +155,9 @@ def create_server(state, port=8765):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--no-browser', action='store_true', help='Non aprire il browser')
-    parser.add_argument('--port', type=int, default=8765, help='Porta locale (predefinita: 8765)')
-    parser.add_argument('--config', type=Path, default=ROOT / 'activities.json', help='File di configurazione')
+    parser.add_argument('--no-browser', action='store_true', help='Do not open the browser')
+    parser.add_argument('--port', type=int, default=8765, help='Local port (default: 8765)')
+    parser.add_argument('--config', type=Path, default=ROOT / 'activities.json', help='Configuration file')
     args = parser.parse_args()
     state = None
     try:
@@ -166,10 +166,10 @@ def main():
     except (ValidationError, OSError, OverflowError) as exc:
         if state:
             state.rpc.close()
-        print(f'Avvio non riuscito: {exc}', file=sys.stderr)
+        print(f'Could not start: {exc}', file=sys.stderr)
         return 1
     url = f'http://127.0.0.1:{server.server_address[1]}'
-    print(f'Discord Activity Controller → {url}\nCtrl+C per spegnere la presenza e uscire.', flush=True)
+    print(f'Discord Activity Controller → {url}\nPress Ctrl+C to clear your presence and exit.', flush=True)
     def shutdown(signum, frame):
         raise KeyboardInterrupt
     signal.signal(signal.SIGTERM, shutdown)
@@ -182,7 +182,7 @@ def main():
     finally:
         server.server_close()
         state.rpc.close()
-        print('\nPresenza disattivata. A presto.')
+        print('\nPresence cleared.')
     return 0
 
 

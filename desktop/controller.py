@@ -31,11 +31,11 @@ def https_url(value):
 
 def validate_activity(data):
     if not isinstance(data, dict):
-        raise ValidationError('Ogni attività deve essere un oggetto JSON.')
+        raise ValidationError('Each activity must be a JSON object.')
     allowed = {'label', 'application_id', 'type', 'details', 'state', 'large_image',
                'large_text', 'small_image', 'small_text', 'timer', 'preview', 'icon', 'buttons'}
     if set(data) - allowed:
-        raise ValidationError('Campi sconosciuti: ' + ', '.join(sorted(set(data) - allowed)))
+        raise ValidationError('Unknown fields: ' + ', '.join(sorted(set(data) - allowed)))
     result = {}
     limits = {'label': 64, 'application_id': 20, 'type': 12, 'details': 128,
               'state': 128, 'large_image': 512, 'large_text': 128,
@@ -43,43 +43,43 @@ def validate_activity(data):
     for key, limit in limits.items():
         value = data.get(key)
         if value is not None and not isinstance(value, str):
-            raise ValidationError(f'{key}: è richiesto un testo.')
+            raise ValidationError(f'{key}: must be text.')
         value = value.strip() if value else None
         if value and len(value) > limit:
-            raise ValidationError(f'{key}: massimo {limit} caratteri.')
+            raise ValidationError(f'{key}: maximum {limit} characters.')
         result[key] = value
     if not result['label']:
-        raise ValidationError('Inserisci un nome per l’attività.')
+        raise ValidationError('Enter a name for the activity.')
     app_id = result['application_id']
     if app_id and (not re.fullmatch(r'[0-9]{17,20}', app_id) or int(app_id) >= 2**64):
-        raise ValidationError('Application ID: usa un ID Discord valido di 17–20 cifre.')
+        raise ValidationError('Application ID: enter a valid 17–20 digit Discord ID.')
     result['type'] = result['type'] or 'playing'
     if result['type'] not in TYPES:
-        raise ValidationError('Tipo di attività non valido.')
+        raise ValidationError('Invalid activity type.')
     for key in ('large_image', 'small_image'):
         if result[key] and not https_url(result[key]):
-            raise ValidationError(f'{key}: inserisci un URL HTTPS valido.')
+            raise ValidationError(f'{key}: enter a valid HTTPS URL.')
     preview = result['preview']
     if preview:
         path = Path(preview)
         if (path.is_absolute() or '..' in path.parts or '\\' in preview
                 or not preview.startswith('static/previews/')
                 or path.suffix.lower() not in {'.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg'}):
-            raise ValidationError('La preview deve essere un’immagine in static/previews/.')
+            raise ValidationError('The preview must be an image in static/previews/.')
     if not isinstance(data.get('timer', False), bool):
-        raise ValidationError('timer deve essere true o false.')
+        raise ValidationError('timer must be true or false.')
     result['timer'] = data.get('timer', False)
     buttons = data.get('buttons') or []
     if not isinstance(buttons, list) or len(buttons) > 2:
-        raise ValidationError('Puoi aggiungere al massimo due pulsanti.')
+        raise ValidationError('You can add up to two buttons.')
     result['buttons'] = []
     for button in buttons:
         if not isinstance(button, dict) or set(button) != {'label', 'url'}:
-            raise ValidationError('Ogni pulsante richiede label e url.')
+            raise ValidationError('Each button requires a label and URL.')
         label, url = button['label'], button['url']
         if (not isinstance(label, str) or not 1 <= len(label.strip()) <= 32
                 or not isinstance(url, str) or len(url) > 512 or not https_url(url)):
-            raise ValidationError('Pulsante: nome di 1–32 caratteri e URL HTTPS valido.')
+            raise ValidationError('Button: use a 1–32 character label and a valid HTTPS URL.')
         result['buttons'].append({'label': label.strip(), 'url': url})
     return result
 
@@ -91,14 +91,14 @@ class ConfigManager:
         try:
             data = json.loads(self.path.read_text(encoding='utf-8'))
             if not isinstance(data, dict):
-                raise ValidationError('La configurazione deve essere un oggetto JSON.')
+                raise ValidationError('Configuration must be a JSON object.')
             self.activities = {}
             for key, value in data.items():
                 if not re.fullmatch(r'[a-zA-Z0-9_-]{1,64}', key):
-                    raise ValidationError(f'Identificatore attività non valido: {key}')
+                    raise ValidationError(f'Invalid activity ID: {key}')
                 self.activities[key] = validate_activity(value)
         except (OSError, ValueError) as exc:
-            raise ValidationError(f'Impossibile caricare {self.path.name}: {exc}. Il file non è stato modificato.') from exc
+            raise ValidationError(f'Could not load {self.path.name}: {exc}. The file was not changed.') from exc
 
     def snapshot(self):
         with self.lock:
@@ -177,7 +177,7 @@ class DiscordIPC:
             except Exception:
                 self.close()
                 raise
-        raise RPCError('Discord non è disponibile. Apri il client desktop; riproverò automaticamente.')
+        raise RPCError('Discord is unavailable. Open the desktop app; reconnecting automatically.')
 
     def send(self, opcode, value):
         payload = json.dumps(value, separators=(',', ':')).encode()
@@ -188,11 +188,11 @@ class DiscordIPC:
         while len(data) < count:
             remaining = deadline - time.monotonic()
             if remaining <= 0:
-                raise TimeoutError('Discord non ha risposto entro 3 secondi.')
+                raise TimeoutError('Discord did not respond within 3 seconds.')
             self.sock.settimeout(remaining)
             chunk = self.sock.recv(count - len(data))
             if not chunk:
-                raise RPCError('Discord si è disconnesso.')
+                raise RPCError('Discord disconnected.')
             data.extend(chunk)
         return data
 
@@ -201,13 +201,13 @@ class DiscordIPC:
         while True:
             opcode, length = struct.unpack('<II', self.exact(8, deadline))
             if length > 1024 * 1024:
-                raise RPCError('Frame Discord troppo grande.')
+                raise RPCError('Discord frame is too large.')
             value = json.loads(self.exact(length, deadline))
             if not isinstance(value, dict):
-                raise RPCError('Risposta Discord non valida.')
+                raise RPCError('Invalid Discord response.')
             if opcode == 2 or value.get('evt') == 'ERROR':
                 message = value.get('data') or value
-                raise RPCError('Discord: ' + str(message.get('message', 'richiesta RPC rifiutata.')))
+                raise RPCError('Discord: ' + str(message.get('message', 'RPC request rejected.')))
             if opcode == 3:
                 self.send(4, value)
             elif match(opcode, value):

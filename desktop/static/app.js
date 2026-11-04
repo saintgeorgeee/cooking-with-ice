@@ -12,7 +12,7 @@ async function api(path, method = 'GET', data) {
     body: data === undefined ? undefined : JSON.stringify(data)
   });
   const result = await response.json();
-  if (!response.ok) throw new Error(result.error || 'Richiesta non riuscita.');
+  if (!response.ok) throw new Error(result.error || 'Request failed.');
   return result;
 }
 function toast(message) {
@@ -51,21 +51,21 @@ function renderCards(force = false) {
   $('#add').hidden = !managing;
   $('#selection-note').hidden = managing;
   $('#manage').setAttribute('aria-pressed', String(managing));
-  $('#grid-hint').textContent = managing ? 'Modifica una carta o crea una nuova attività.' : 'Scegli un’attività per mostrarla su Discord.';
+  $('#grid-hint').textContent = managing ? 'Edit or add an activity.' : 'Choose an activity for Discord.';
   for (const [id, activity] of Object.entries(activities)) {
     const selected = status.selected_id === id, active = status.active_id === id;
     const card = element('article', 'activity-card' + (selected ? ' selected' : '') + (active ? ' confirmed' : ''));
     const button = element('button', 'card-main');
     button.type = 'button'; button.dataset.activity = id;
     button.setAttribute('aria-pressed', String(selected));
-    button.setAttribute('aria-label', `${managing ? 'Modifica' : 'Attiva'} ${activity.label}${!activity.application_id ? ' · da configurare' : ''}`);
+    button.setAttribute('aria-label', `${managing ? 'Edit' : 'Activate'} ${activity.label}${!activity.application_id ? ' · needs setup' : ''}`);
     const image = element('div', 'card-image'); artwork(activity, image, true);
     const body = element('div', 'card-body');
     const label = element('div', 'card-label');
     label.append(element('span', 'card-icon', activity.icon || '✦'), element('span', '', activity.label));
     const meta = element('div', 'card-meta');
     const state = element('span', 'card-status');
-    state.append(element('span', 'dot'), element('span', '', active ? 'In corso' : selected ? 'In attesa' : activity.application_id ? 'Pronta' : 'Da configurare'));
+    state.append(element('span', 'dot'), element('span', '', active ? 'Active' : selected ? 'Waiting' : activity.application_id ? 'Ready' : 'Needs setup'));
     meta.append(state, element('span', 'card-timer', activity.timer ? '◷' : ''));
     meta.hidden = !active && !selected && !!activity.application_id && !activity.timer;
     body.append(label, meta); button.append(image, body); card.append(button);
@@ -73,7 +73,7 @@ function renderCards(force = false) {
     button.addEventListener('click', () => managing || !activity.application_id ? openEditor(id) : activate(id));
     if (managing) {
       const edit = element('button', 'card-edit', '✎');
-      edit.setAttribute('aria-label', `Modifica ${activity.label}`);
+      edit.setAttribute('aria-label', `Edit ${activity.label}`);
       edit.addEventListener('click', () => openEditor(id)); card.append(edit);
     }
     grid.append(card);
@@ -87,7 +87,7 @@ function clock() {
   $('#elapsed').hidden = false;
   const elapsed = Math.max(0, Math.floor(Date.now() / 1000 - status.started_at));
   const h = Math.floor(elapsed / 3600), m = Math.floor(elapsed / 60) % 60, s = elapsed % 60;
-  $('#elapsed').textContent = `Tempo trascorso · ${[h,m,s].map(n => String(n).padStart(2,'0')).join(':')}${status.phase === 'active' ? '' : ' · in attesa di Discord'}`;
+  $('#elapsed').textContent = `Elapsed · ${[h,m,s].map(n => String(n).padStart(2,'0')).join(':')}${status.phase === 'active' ? '' : ' · waiting for Discord'}`;
 }
 function renderStatus(next) {
   status = next; offline = false;
@@ -96,9 +96,9 @@ function renderStatus(next) {
   const stopping = status.phase === 'stopping';
   const badge = $('#presence-badge');
   badge.hidden = !activity && !stopping;
-  badge.textContent = active ? '● ATTIVA' : activity ? (status.phase === 'connecting' ? '◌ CONNESSIONE' : '○ IN ATTESA') : stopping ? '◌ SPEGNIMENTO' : 'OFF';
+  badge.textContent = active ? '● ACTIVE' : activity ? (status.phase === 'connecting' ? '◌ CONNECTING' : '○ WAITING') : stopping ? '◌ STOPPING' : 'OFF';
   badge.className = 'pill' + (active ? ' active' : activity ? ' waiting' : '');
-  $('#current-title').textContent = activity?.label || 'Nessuna attività';
+  $('#current-title').textContent = activity?.label || 'No activity';
   $('.current-panel').classList.toggle('active', active);
   $('#turn-off').disabled = !status.selected_id && !stopping;
   $('#rpc-error').hidden = !status.error;
@@ -112,8 +112,8 @@ function renderStatus(next) {
   }
   const connection = $('#connection');
   connection.className = 'connection' + (status.connected ? ' connected' : status.discord_available ? ' available' : '');
-  connection.lastElementChild.textContent = status.connected ? 'Discord · Connesso' : 'Discord · Disconnesso';
-  if (active && lastPhase !== `${status.generation}:active`) toast(`${activity?.label} è attiva su Discord.`);
+  connection.lastElementChild.textContent = status.connected ? 'Discord · Connected' : 'Discord · Disconnected';
+  if (active && lastPhase !== `${status.generation}:active`) toast(`${activity?.label} is active on Discord.`);
   lastPhase = `${status.generation}:${status.phase}`;
   clock(); renderCards();
 }
@@ -141,7 +141,7 @@ function openEditor(id) {
     form.elements.namedItem(`button${index+1}_label`).value = button.label;
     form.elements.namedItem(`button${index+1}_url`).value = button.url;
   });
-  $('#editor-title').textContent = id ? 'Modifica attività' : 'Nuova attività';
+  $('#editor-title').textContent = id ? 'Edit activity' : 'New activity';
   $('#delete').hidden = !id; $('#form-error').hidden = true;
   $('#editor').showModal();
 }
@@ -160,7 +160,7 @@ $('#edit-form').addEventListener('submit', async event => {
   $('#save').disabled = true;
   try {
     await api(editing ? `/api/activities/${encodeURIComponent(editing)}` : '/api/activities', editing ? 'PUT' : 'POST', data);
-    await refreshActivities(); $('#editor').close(); toast('Attività salvata sul tuo computer.');
+    await refreshActivities(); $('#editor').close(); toast('Activity saved.');
   } catch(error) { $('#form-error').textContent = error.message; $('#form-error').hidden = false; }
   finally { $('#save').disabled = false; }
 });
@@ -169,7 +169,7 @@ $('#confirm-delete').addEventListener('close', async () => {
   if ($('#confirm-delete').returnValue !== 'delete') return;
   try {
     await api(`/api/activities/${encodeURIComponent(editing)}`, 'DELETE');
-    await refreshActivities(); $('#editor').close(); toast('Attività eliminata.');
+    await refreshActivities(); $('#editor').close(); toast('Activity deleted.');
   } catch(error) { $('#form-error').textContent = error.message; $('#form-error').hidden = false; }
 });
 async function refreshActivities() {
@@ -181,18 +181,18 @@ async function poll() {
   catch {
     offline = true;
     $('#connection').className = 'connection';
-    $('#connection').lastElementChild.textContent = 'Server locale non raggiungibile · Riavvia l’app';
-    $('#presence-badge').textContent = '○ NON VERIFICATO';
+    $('#connection').lastElementChild.textContent = 'Local server unavailable · Restart the app';
+    $('#presence-badge').textContent = '○ UNVERIFIED';
     $('#presence-badge').className = 'pill waiting';
     $('.current-panel').classList.remove('active');
     $('#elapsed').hidden = false;
-    $('#elapsed').textContent = 'Connessione al dashboard interrotta.';
+    $('#elapsed').textContent = 'Connection to the app was lost.';
   }
   setTimeout(poll, 2000);
 }
 async function boot() {
   try { await refreshActivities(); }
-  catch (error) { toast('Impossibile caricare le attività: ' + error.message); setTimeout(boot, 5000); return; }
+  catch (error) { toast('Could not load activities: ' + error.message); setTimeout(boot, 5000); return; }
   poll();
 }
 setInterval(() => { if (!offline) clock(); }, 1000);
