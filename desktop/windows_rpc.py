@@ -24,7 +24,7 @@ class WindowsIPC:
             self.rpc.connect()
         except Exception as exc:
             self.close()
-            raise RPCError(f'Discord non è disponibile: {exc}') from exc
+            raise RPCError(f'Discord is unavailable: {exc}') from exc
 
     def update(self, activity):
         try:
@@ -41,7 +41,7 @@ class WindowsIPC:
         try:
             self.loop.run_until_complete(asyncio.sleep(0))
             if self.rpc.sock_reader.at_eof() or self.rpc.sock_writer.is_closing():
-                raise RPCError('Discord si è disconnesso.')
+                raise RPCError('Discord disconnected.')
         except RPCError:
             raise
         except Exception as exc:
