@@ -66,7 +66,8 @@ function renderCards(force = false) {
     const meta = element('div', 'card-meta');
     const state = element('span', 'card-status');
     state.append(element('span', 'dot'), element('span', '', active ? 'In corso' : selected ? 'In attesa' : activity.application_id ? 'Pronta' : 'Da configurare'));
-    meta.append(state, element('span', 'card-timer', activity.timer ? '◷' : types[activity.type]));
+    meta.append(state, element('span', 'card-timer', activity.timer ? '◷' : ''));
+    meta.hidden = !active && !selected && !!activity.application_id && !activity.timer;
     body.append(label, meta); button.append(image, body); card.append(button);
     if (selected) card.append(element('span', 'live-marker', active ? '✓' : '·'));
     button.addEventListener('click', () => managing || !activity.application_id ? openEditor(id) : activate(id));
@@ -82,7 +83,8 @@ function renderCards(force = false) {
 function clock() {
   const activity = activities[status.selected_id];
   if (!activity) return;
-  if (!activity.timer) { $('#elapsed').textContent = status.phase === 'active' ? 'Attiva su Discord.' : 'Ripristino automatico appena Discord è disponibile.'; return; }
+  if (!activity.timer) { $('#elapsed').hidden = true; return; }
+  $('#elapsed').hidden = false;
   const elapsed = Math.max(0, Math.floor(Date.now() / 1000 - status.started_at));
   const h = Math.floor(elapsed / 3600), m = Math.floor(elapsed / 60) % 60, s = elapsed % 60;
   $('#elapsed').textContent = `Tempo trascorso · ${[h,m,s].map(n => String(n).padStart(2,'0')).join(':')}${status.phase === 'active' ? '' : ' · in attesa di Discord'}`;
@@ -93,14 +95,15 @@ function renderStatus(next) {
   const active = status.phase === 'active';
   const stopping = status.phase === 'stopping';
   const badge = $('#presence-badge');
+  badge.hidden = !activity && !stopping;
   badge.textContent = active ? '● ATTIVA' : activity ? (status.phase === 'connecting' ? '◌ CONNESSIONE' : '○ IN ATTESA') : stopping ? '◌ SPEGNIMENTO' : 'OFF';
   badge.className = 'pill' + (active ? ' active' : activity ? ' waiting' : '');
-  $('#current-title').textContent = activity?.label || 'Nessuna attività personalizzata';
+  $('#current-title').textContent = activity?.label || 'Nessuna attività';
   $('.current-panel').classList.toggle('active', active);
   $('#turn-off').disabled = !status.selected_id && !stopping;
   $('#rpc-error').hidden = !status.error;
   $('#rpc-error').textContent = status.error || '';
-  if (!activity) $('#elapsed').textContent = stopping ? 'Chiusura della connessione RPC…' : 'Scegli una carta qui sotto per iniziare.';
+  if (!activity) $('#elapsed').hidden = true;
   const art = $('#current-art');
   const artKey = activity ? `${status.selected_id}:${activity.preview}:${activity.large_image}` : '';
   if (art.dataset.key !== artKey) {
@@ -109,7 +112,7 @@ function renderStatus(next) {
   }
   const connection = $('#connection');
   connection.className = 'connection' + (status.connected ? ' connected' : status.discord_available ? ' available' : '');
-  connection.lastElementChild.textContent = status.connected ? 'Discord · Connesso' : status.discord_available && !status.selected_id ? 'Discord · Disconnesso · Scegli un’attività per connetterti' : 'Discord · Disconnesso · In attesa del client desktop';
+  connection.lastElementChild.textContent = status.connected ? 'Discord · Connesso' : 'Discord · Disconnesso';
   if (active && lastPhase !== `${status.generation}:active`) toast(`${activity?.label} è attiva su Discord.`);
   lastPhase = `${status.generation}:${status.phase}`;
   clock(); renderCards();
@@ -182,6 +185,7 @@ async function poll() {
     $('#presence-badge').textContent = '○ NON VERIFICATO';
     $('#presence-badge').className = 'pill waiting';
     $('.current-panel').classList.remove('active');
+    $('#elapsed').hidden = false;
     $('#elapsed').textContent = 'Connessione al dashboard interrotta.';
   }
   setTimeout(poll, 2000);
