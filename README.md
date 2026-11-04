@@ -43,8 +43,8 @@ Copy this entire block into Terminal:
 ```bash
 mkdir -p "$HOME/discord-rich-presence"
 cd "$HOME/discord-rich-presence"
-curl --fail --location "https://raw.githubusercontent.com/saintgeorgeee/cooking-with-ice/refs/heads/main/rich_presence.py" --output rich_presence.py
-curl --fail --location "https://raw.githubusercontent.com/saintgeorgeee/cooking-with-ice/refs/heads/main/requirements.txt" --output requirements.txt
+curl --fail --location "https://raw.githubusercontent.com/saintgeorgeee/custom-discord-activities/refs/heads/main/rich_presence.py" --output rich_presence.py
+curl --fail --location "https://raw.githubusercontent.com/saintgeorgeee/custom-discord-activities/refs/heads/main/requirements.txt" --output requirements.txt
 python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
 ```
@@ -95,8 +95,8 @@ Copy this entire block into PowerShell:
 ```powershell
 New-Item -ItemType Directory -Force -Path "$HOME\discord-rich-presence" | Out-Null
 Set-Location "$HOME\discord-rich-presence"
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/saintgeorgeee/cooking-with-ice/refs/heads/main/rich_presence.py" -OutFile "rich_presence.py"
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/saintgeorgeee/cooking-with-ice/refs/heads/main/requirements.txt" -OutFile "requirements.txt"
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/saintgeorgeee/custom-discord-activities/refs/heads/main/rich_presence.py" -OutFile "rich_presence.py"
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/saintgeorgeee/custom-discord-activities/refs/heads/main/requirements.txt" -OutFile "requirements.txt"
 py -3 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
@@ -131,7 +131,7 @@ You do **not** need to reinstall the package each time.
 The Framewisp URL is already included in the script. You do not need to upload the animation again or paste the URL into the start command.
 
 ```text
-https://raw.githubusercontent.com/saintgeorgeee/cooking-with-ice/refs/heads/main/Wispy_making_pancakes.webp
+https://raw.githubusercontent.com/saintgeorgeee/custom-discord-activities/refs/heads/main/Wispy_making_pancakes.webp
 ```
 
 To use your own image, add `--image "YOUR_DIRECT_HTTPS_IMAGE_URL"` to a start command. The URL must return the image itself, not a web page or a local file. For animated WebP, use a public external URL; uploaded Discord Art Assets do not support animation. See [Discord's activity asset documentation](https://github.com/discord/discord-api-docs/blob/main/developers/events/gateway-events.mdx).
