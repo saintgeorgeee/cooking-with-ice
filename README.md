@@ -152,3 +152,5 @@ The activity stays running while the script and Discord are open. Ctrl+C clears 
 ## How it works
 
 [`rich_presence.py`](rich_presence.py) uses [pypresence](https://qwertyquerty.github.io/pypresence/html/info/quickstart.html) to connect locally to Discord through RPC, publish the image, and keep the process alive. It does not log in to your account or require credentials. Setup uses Python's built-in [virtual environments](https://docs.python.org/3/tutorial/venv.html).
+
+Coded with codex
