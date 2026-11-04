@@ -1,0 +1,32 @@
+{
+  "cooking_ice": {
+    "label": "Cracking ice",
+    "application_id": "1566577658631028847",
+    "type": "playing",
+    "details": null,
+    "state": null,
+    "large_image": "https://raw.githubusercontent.com/saintgeorgeee/custom-discord-activities/main/minecraft_ice_cycle_512_5fps_exact_timing.webp",
+    "large_text": "Blue Ice → Packed Ice → Ice",
+    "small_image": null,
+    "small_text": null,
+    "preview": "static/previews/cooking_ice.webp",
+    "icon": "🧊",
+    "timer": false,
+    "buttons": []
+  },
+  "framewisp": {
+    "label": "Figma with Framewisp",
+    "application_id": "1567537009751498902",
+    "type": "playing",
+    "details": null,
+    "state": null,
+    "large_image": "https://raw.githubusercontent.com/saintgeorgeee/custom-discord-activities/main/Wispy_making_pancakes.webp",
+    "large_text": null,
+    "small_image": null,
+    "small_text": null,
+    "preview": "static/previews/framewisp.webp",
+    "icon": "🥞",
+    "timer": false,
+    "buttons": []
+  }
+}

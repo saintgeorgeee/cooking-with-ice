@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="controller-token" content="__TOKEN__">
+  <meta name="theme-color" content="#101115">
+  <title>Discord Activity Controller</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/style.css">
+  <script defer src="/static/app.js"></script>
+</head>
+<body>
+<div class="app-shell">
+  <header class="app-header">
+    <a class="brand" href="/" aria-label="Discord Activity Controller"><span class="brand-mark">◈</span><span>Activity Controller<span class="brand-sub">IL TUO SPAZIO. IL TUO STATO.</span></span></a>
+    <div class="local-badge"><span class="dot"></span> Solo su questo computer</div>
+  </header>
+  <main>
+    <div class="intro"><div><p class="eyebrow">DISCORD RICH PRESENCE</p><h1>Di cosa ti occupi?</h1><p class="subtitle">Un piccolo cambio di stato. Tutto il tuo mondo.</p></div><button id="manage" class="button secondary" aria-pressed="false"><span aria-hidden="true">⚙</span> Gestisci attività</button></div>
+    <details class="guide"><summary>Come configurare Discord e aggiungere un’attività <span>＋</span></summary><div class="guide-content"><p><strong>Per iniziare:</strong> apri Discord sul computer, poi scegli una carta. Le due animazioni incluse sono già configurate.</p><p><strong>Per un nome personale:</strong> visita il <a href="https://discord.com/developers/applications" target="_blank" rel="noopener noreferrer">Discord Developer Portal ↗</a>, crea una nuova applicazione con il nome desiderato e copia il suo <strong>Application ID</strong> da General Information.</p><p><strong>Per un’immagine animata personale:</strong> carica il file su un servizio pubblico, come un repository GitHub pubblico, e copia il collegamento diretto HTTPS al file (su GitHub, usa il link raw). Apri <strong>Gestisci attività → Nuova attività</strong>, inserisci nome, Application ID e URL in <strong>Immagini e anteprima → Immagine grande</strong>, quindi salva.</p><p>Il nome mostrato su Discord è quello della tua applicazione Discord. Premi <strong>Turn Off</strong> per spegnere la presenza; chiudere l’app la disattiva.</p></div></details>
+    <section class="current-panel" aria-labelledby="current-heading">
+      <div class="current-info"><p class="eyebrow" id="current-heading">LA TUA ATTIVITÀ</p><div class="current-title-row"><span id="current-title">Nessuna attività personalizzata</span><span id="presence-badge" class="pill">OFF</span></div><p id="elapsed" class="current-sub">Scegli una carta qui sotto per iniziare.</p><p id="rpc-error" class="rpc-error" hidden></p></div>
+      <div id="current-art" class="current-art" aria-hidden="true">◈</div>
+      <button id="turn-off" class="button off" disabled><span aria-hidden="true">⏻</span> Turn Off</button>
+    </section>
+    <div class="section-heading"><div><h2>Le tue attività <span id="activity-count" class="count">0</span></h2><p id="grid-hint">Scegli un’attività per mostrarla su Discord.</p></div><button id="add" class="button secondary" hidden>＋ Nuova attività</button><span class="selection-note" id="selection-note"><span class="tiny-square"></span> Una presenza alla volta</span></div>
+    <section id="activities" class="activity-grid" aria-label="Attività configurate"></section>
+    <div class="empty" id="empty" hidden><span>✦</span><h2>Fai spazio alla tua prima attività.</h2><p>Entra in Gestisci attività e aggiungine una.</p></div>
+    <footer><div id="connection" class="connection"><span class="dot"></span><span>Discord · Verifica connessione…</span></div><span>Privato, locale, senza token Discord.<span class="footer-spark"> ✧</span></span></footer>
+  </main>
+</div>
+<div id="toast" role="status" class="toast" hidden></div>
+<dialog id="editor" aria-labelledby="editor-title">
+  <form id="edit-form">
+    <div class="dialog-heading"><div><p class="eyebrow">IL TUO RICH PRESENCE</p><h2 id="editor-title">Modifica attività</h2></div><button type="button" id="close-editor" class="icon-button" aria-label="Chiudi">×</button></div>
+    <div class="form-body">
+      <div class="form-row"><label class="grow">Nome nel dashboard<input name="label" required maxlength="64" placeholder="Es. Studying"></label><label class="icon-field">Icona<input name="icon" maxlength="12" placeholder="✦"></label></div>
+      <label>Discord Application ID<input name="application_id" inputmode="numeric" pattern="[0-9]{17,20}" maxlength="20" placeholder="17–20 cifre · vuoto per una bozza"><small>Il nome mostrato da Discord viene dall’applicazione registrata.</small></label>
+      <div class="form-row"><label class="grow">Tipo di attività<select name="type"><option value="playing">Playing</option><option value="listening">Listening</option><option value="watching">Watching</option><option value="competing">Competing</option></select></label><label class="toggle-label"><input type="checkbox" name="timer"><span>Timer trascorso</span></label></div>
+      <label>Dettagli <span class="optional">opzionale</span><input name="details" maxlength="128" placeholder="A cosa stai lavorando?"></label>
+      <label>Stato <span class="optional">opzionale</span><input name="state" maxlength="128" placeholder="Un piccolo dettaglio in più"></label>
+      <details><summary>Immagini e anteprima <span>↗</span></summary><div class="detail-fields">
+        <label>Immagine grande · URL HTTPS<input name="large_image" type="url" maxlength="512" placeholder="https://…"></label>
+        <label>Testo al passaggio del mouse<input name="large_text" maxlength="128"></label>
+        <label>Immagine piccola · URL HTTPS<input name="small_image" type="url" maxlength="512" placeholder="https://…"></label>
+        <label>Testo immagine piccola<input name="small_text" maxlength="128"></label>
+        <p class="field-note">L’URL dell’immagine grande viene usato anche come anteprima se non ne hai scelta una locale.</p>
+      </div></details>
+      <details><summary>Pulsanti Discord <span>↗</span></summary><div class="detail-fields"><p class="field-note">Fino a due link HTTPS, visibili agli altri utenti se supportati dal client.</p><label>Pulsante 1 · Etichetta<input name="button1_label" maxlength="32"></label><label>Pulsante 1 · URL<input name="button1_url" type="url" maxlength="512" placeholder="https://…"></label><label>Pulsante 2 · Etichetta<input name="button2_label" maxlength="32"></label><label>Pulsante 2 · URL<input name="button2_url" type="url" maxlength="512" placeholder="https://…"></label></div></details>
+      <p id="form-error" class="form-error" role="alert" hidden></p>
+    </div>
+    <div class="dialog-footer"><button type="button" id="delete" class="button danger">Elimina</button><div><button type="button" id="cancel" class="button secondary">Annulla</button><button id="save" type="submit" class="button primary">Salva attività</button></div></div>
+  </form>
+</dialog>
+<dialog id="confirm-delete" class="confirm-dialog" aria-labelledby="delete-heading"><form method="dialog"><h2 id="delete-heading">Eliminare l’attività?</h2><p>La configurazione verrà rimossa dal tuo computer.</p><div class="confirm-actions"><button class="button secondary" value="cancel">Annulla</button><button class="button danger" value="delete">Elimina attività</button></div></form></dialog>
+</body>
+</html>
