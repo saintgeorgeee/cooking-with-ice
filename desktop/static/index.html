@@ -13,26 +13,25 @@
 <div class="app-shell">
   <header class="app-header">
     <a class="brand" href="/" aria-label="Discord Activity Controller"><span class="brand-mark">●</span><span>Activity Controller</span></a>
-    <div class="local-badge"><span class="dot"></span> Solo su questo computer</div>
+    <button id="manage" class="button secondary" aria-pressed="false">Gestisci</button>
   </header>
   <main>
-    <div class="intro"><div><h1>Attività</h1><p class="subtitle">Scegli cosa mostrare sul tuo profilo Discord.</p></div><button id="manage" class="button secondary" aria-pressed="false"><span aria-hidden="true">⚙</span> Gestisci attività</button></div>
-    <section class="current-panel" aria-labelledby="current-heading">
-      <div class="current-info"><p class="eyebrow" id="current-heading">ATTIVITÀ CORRENTE</p><div class="current-title-row"><span id="current-title">Nessuna attività personalizzata</span><span id="presence-badge" class="pill">OFF</span></div><p id="elapsed" class="current-sub">Scegli una carta qui sotto per iniziare.</p><p id="rpc-error" class="rpc-error" hidden></p></div>
+    <section class="current-panel" aria-label="Attività corrente">
+      <div class="current-info"><div class="current-title-row"><span id="current-title">Nessuna attività</span><span id="presence-badge" class="pill">OFF</span></div><p id="elapsed" class="current-sub" hidden></p><p id="rpc-error" class="rpc-error" hidden></p></div>
       <div id="current-art" class="current-art" aria-hidden="true"></div>
       <button id="turn-off" class="button off" disabled><span aria-hidden="true">⏻</span> Turn Off</button>
     </section>
-    <div class="section-heading"><div><h2>Disponibili <span id="activity-count" class="count">0</span></h2><p id="grid-hint">Scegli un’attività per mostrarla su Discord.</p></div><button id="add" class="button secondary" hidden>+ Aggiungi attività</button><span class="selection-note" id="selection-note"><span class="tiny-square"></span> Una presenza alla volta</span></div>
+    <div class="section-heading"><span id="activity-count" hidden></span><p id="grid-hint" hidden></p><button id="add" class="button secondary" hidden>+ Aggiungi attività</button><span id="selection-note" hidden></span></div>
     <section id="activities" class="activity-grid" aria-label="Attività configurate"></section>
     <div class="empty" id="empty" hidden><span>✦</span><h2>Nessuna attività.</h2><p>Entra in Gestisci attività e aggiungine una.</p></div>
-    <details class="guide"><summary>Come configurare Discord e aggiungere un’attività <span>+</span></summary><div class="guide-content"><p><strong>Per iniziare:</strong> apri Discord sul computer, poi scegli una carta. Le due animazioni incluse sono già configurate.</p><p><strong>Per un nome personale:</strong> visita il <a href="https://discord.com/developers/applications" target="_blank" rel="noopener noreferrer">Discord Developer Portal ↗</a>, crea una nuova applicazione con il nome desiderato e copia il suo <strong>Application ID</strong> da General Information.</p><p><strong>Per un’immagine animata personale:</strong> carica il file su un servizio pubblico, come un repository GitHub pubblico, e copia il collegamento diretto HTTPS al file (su GitHub, usa il link raw). Apri <strong>Gestisci attività → Nuova attività</strong>, inserisci nome, Application ID e URL in <strong>Immagini e anteprima → Immagine grande</strong>, quindi salva.</p><p>Il nome mostrato su Discord è quello della tua applicazione Discord. Premi <strong>Turn Off</strong> per spegnere la presenza; chiudere l’app la disattiva.</p></div></details>
-    <footer><div id="connection" class="connection"><span class="dot"></span><span>Discord · Verifica connessione…</span></div><span>Le attività vengono gestite su questo computer.</span></footer>
+    <details class="guide"><summary>Guida <span>+</span></summary><div class="guide-content"><p>Apri Discord e scegli un’attività. Usa <strong>Turn Off</strong> per spegnerla.</p><p>Per aggiungerne una: crea un’applicazione nel <a href="https://discord.com/developers/applications" target="_blank" rel="noopener noreferrer">Discord Developer Portal</a> e copia il suo Application ID. Carica l’immagine online e copia il suo URL HTTPS diretto.</p><p>In <strong>Gestisci → Aggiungi attività</strong>, inserisci l’ID e l’URL in <strong>Immagini e anteprima</strong>, poi salva. Il nome visibile su Discord è quello dell’applicazione Discord.</p></div></details>
+    <footer><div id="connection" class="connection"><span class="dot"></span><span>Discord · Verifica connessione…</span></div></footer>
   </main>
 </div>
 <div id="toast" role="status" class="toast" hidden></div>
 <dialog id="editor" aria-labelledby="editor-title">
   <form id="edit-form">
-    <div class="dialog-heading"><div><p class="eyebrow">IL TUO RICH PRESENCE</p><h2 id="editor-title">Modifica attività</h2></div><button type="button" id="close-editor" class="icon-button" aria-label="Chiudi">×</button></div>
+    <div class="dialog-heading"><div><h2 id="editor-title">Modifica attività</h2></div><button type="button" id="close-editor" class="icon-button" aria-label="Chiudi">×</button></div>
     <div class="form-body">
       <div class="form-row"><label class="grow">Nome nel dashboard<input name="label" required maxlength="64" placeholder="Es. Studying"></label><label class="icon-field">Icona<input name="icon" maxlength="12" placeholder="✦"></label></div>
       <label>Discord Application ID<input name="application_id" inputmode="numeric" pattern="[0-9]{17,20}" maxlength="20" placeholder="17–20 cifre · vuoto per una bozza"><small>Il nome mostrato da Discord viene dall’applicazione registrata.</small></label>
