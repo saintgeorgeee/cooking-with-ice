@@ -7,7 +7,7 @@ import sys
 import time
 from urllib.parse import urlsplit
 
-BASE_URL = 'https://raw.githubusercontent.com/saintgeorgeee/cooking-with-ice/refs/heads/main/'
+BASE_URL = 'https://raw.githubusercontent.com/saintgeorgeee/custom-discord-activities/refs/heads/main/'
 ACTIVITIES = {
     'cooking': {
         'label': 'Cooking with ice',
